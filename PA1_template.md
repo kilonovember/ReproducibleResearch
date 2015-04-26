@@ -31,6 +31,9 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
       mean(spd$x)
     }
 
+##### Mean steps per day
+
+
 ```r
     mean.steps(df)
 ```
@@ -49,6 +52,9 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
       median(spd$x)
     }
 
+##### Median steps per day
+
+
 ```r
     median.steps(df)
 ```
@@ -56,11 +62,11 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
 ```
 ## [1] 10395
 ```
-### A histogram of steps taken per five-minute interval with a bin-width of 1000 steps
+### A histogram of steps taken per day with a bin-width of 1000 steps
 
     histo.steps <- function(df){
       agg <- aggregate(df$steps, list(df$date), sum, na.rm=TRUE)
-      ggplot(agg, aes(x=x)) + geom_histogram(data=agg$steps, binwidth = 1000, color="black", fill="white") +  scale_y_continuous(breaks=seq(0, 20, 1)) + ylab("Count of Intevals") + xlab("Steps per Interval")
+      ggplot(agg, aes(x=x)) + geom_histogram(data=agg$steps, binwidth = 1000, color="black", fill="white") +  scale_y_continuous(breaks=seq(0, 20, 1)) + ylab("Count of Days") + xlab("Steps per Day")
     }
 
 
@@ -85,6 +91,25 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
 
 ![](PA1_template_files/figure-html/PLOT_DAILY_ACTIVITY-1.png) 
 
+##### Five-minute interval with the highest average number of steps
+
+    steps.grouped.by.interval <- function(df){
+      # Compute the mean number of steps per five-minute interval over the period of the data set
+      aggregate(df$steps, list(df$interval), mean, na.rm=TRUE)
+    }
+
+
+```r
+    sgbi <- steps.grouped.by.interval(df)
+    colnames(sgbi) <- c("Interval", "Mean_Steps")
+    sgbi[sgbi$Mean_Steps == max(sgbi$Mean_Steps),]
+```
+
+```
+##     Interval Mean_Steps
+## 104      835   206.1698
+```
+
 # Imputing missing values
 
 ## Calculate and report the total number of missing values in the dataset
@@ -104,6 +129,10 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
 
 
 ## Synthetic data set with NAs replaced by the mean value of identical periods in the days where a value has been recorded
+
+The data for the missing five-minute periods was synthesized by computing the mean values for the corresponding periods 
+on those days for which actual step counts are recorded. These mean values were then imputed to the periods for which no 
+data was recorded.
 
     synthesize.missing.data <- function(df){
       incomplete.cases <- subset.NAs(df)
@@ -139,7 +168,7 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
 ```r
   actual.obs <- subset.complete.cases(df)
 ```
-## Create a new dataset that is equal to the original dataset but with the missing data filled in.
+### Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
     merge.datasets <- function(synth.obs, actual.obs){
       # synth.obs are those rows with the synthesized
@@ -155,7 +184,8 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
 ```r
   merged.data <- merge.datasets(synth.obs, actual.obs)
 ```
-### A histogram of steps taken per five-minute interval with a bin-width of 1000 steps, merged data set
+
+### A histogram of steps taken per day with a bin-width of 1000 steps, merged data set
 
 ```r
     histo.steps(merged.data)

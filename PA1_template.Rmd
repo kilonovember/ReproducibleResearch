@@ -40,7 +40,7 @@ median.steps <-function(df){
 
 histo.steps <- function(df){
   agg <- aggregate(df$steps, list(df$date), sum, na.rm=TRUE)
-  ggplot(agg, aes(x=x)) + geom_histogram(data=agg$steps, binwidth = 1000, color="black", fill="white") +  scale_y_continuous(breaks=seq(0, 20, 1)) + ylab("Count of Intevals") + xlab("Steps per Interval")
+  ggplot(agg, aes(x=x)) + geom_histogram(data=agg$steps, binwidth = 1000, color="black", fill="white") +  scale_y_continuous(breaks=seq(0, 20, 1)) + ylab("Count of Days") + xlab("Steps per Day")
 }
 
 histo.steps.synth <- function(df){
@@ -155,6 +155,9 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
       #Compute mean
       mean(spd$x)
     }
+
+##### Mean steps per day
+
 ```{r COMPUTE_MEAN_STEPS, echo=TRUE}
     mean.steps(df)
 ```
@@ -168,14 +171,17 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
       #Compute median
       median(spd$x)
     }
+
+##### Median steps per day
+
 ```{r COMPUTE_MEDIAN_STEPS, echo=TRUE}
     median.steps(df)
 ```
-### A histogram of steps taken per five-minute interval with a bin-width of 1000 steps
+### A histogram of steps taken per day with a bin-width of 1000 steps
 
     histo.steps <- function(df){
       agg <- aggregate(df$steps, list(df$date), sum, na.rm=TRUE)
-      ggplot(agg, aes(x=x)) + geom_histogram(data=agg$steps, binwidth = 1000, color="black", fill="white") +  scale_y_continuous(breaks=seq(0, 20, 1)) + ylab("Count of Intevals") + xlab("Steps per Interval")
+      ggplot(agg, aes(x=x)) + geom_histogram(data=agg$steps, binwidth = 1000, color="black", fill="white") +  scale_y_continuous(breaks=seq(0, 20, 1)) + ylab("Count of Days") + xlab("Steps per Day")
     }
 
 ```{r HISTOGRAM_OF_STEPS, echo=TRUE}
@@ -194,6 +200,19 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
   ts.plot(df)
 ```
 
+##### Five-minute interval with the highest average number of steps
+
+    steps.grouped.by.interval <- function(df){
+      # Compute the mean number of steps per five-minute interval over the period of the data set
+      aggregate(df$steps, list(df$interval), mean, na.rm=TRUE)
+    }
+
+```{r INTERVAL_WITH_MAXIMUM_AVERAGE_STEP, echo=TRUE}
+    sgbi <- steps.grouped.by.interval(df)
+    colnames(sgbi) <- c("Interval", "Mean_Steps")
+    sgbi[sgbi$Mean_Steps == max(sgbi$Mean_Steps),]
+```
+
 # Imputing missing values
 
 ## Calculate and report the total number of missing values in the dataset
@@ -208,6 +227,10 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
 
 
 ## Synthetic data set with NAs replaced by the mean value of identical periods in the days where a value has been recorded
+
+The data for the missing five-minute periods was synthesized by computing the mean values for the corresponding periods 
+on those days for which actual step counts are recorded. These mean values were then imputed to the periods for which no 
+data was recorded.
 
     synthesize.missing.data <- function(df){
       incomplete.cases <- subset.NAs(df)
@@ -256,7 +279,8 @@ https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip
 ```{r MERGE_SYNTHETIC_AND_ACTUAL_VALUES, echo=TRUE}
   merged.data <- merge.datasets(synth.obs, actual.obs)
 ```
-### A histogram of steps taken per five-minute interval with a bin-width of 1000 steps, merged data set
+
+### A histogram of steps taken per day with a bin-width of 1000 steps, merged data set
 ```{r HISTOGRAM_OF_MERGED_DATA_SET}
     histo.steps(merged.data)
 ```

@@ -25,7 +25,7 @@ median.steps <-function(df){
 
 histo.steps <- function(df){
   agg <- aggregate(df$steps, list(df$date), sum, na.rm=TRUE)
-  ggplot(agg, aes(x=x)) + geom_histogram(data=agg$steps, binwidth = 1000, color="black", fill="white") +  scale_y_continuous(breaks=seq(0, 20, 1)) + ylab("Count of Intevals") + xlab("Steps per Interval")
+  ggplot(agg, aes(x=x)) + geom_histogram(data=agg$steps, binwidth = 1000, color="black", fill="white") +  scale_y_continuous(breaks=seq(0, 20, 1)) + ylab("Count of Days") + xlab("Steps per Day")
 }
 
 histo.steps.synth <- function(df){
@@ -37,7 +37,7 @@ histo.steps.synth <- function(df){
 
 steps.grouped.by.interval <- function(df){
   # Compute the mean number of steps per five-minute interval over the period of the data set
-  agg.by.interval <- aggregate(df$steps, list(df$interval), mean, na.rm=TRUE)
+   aggregate(df$steps, list(df$interval), mean, na.rm=TRUE)
 }
 
 ts.plot <- function(df){
